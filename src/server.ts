@@ -3,18 +3,21 @@ import * as http from 'http';
 import { Message } from './types/users';
 import { ApiError } from './utils/errors';
 import { extractBody, parseIncomingRequest } from './routes/routes';
+import { requestDatabase } from './database/databaseService';
+import { Database } from './database/database';
 
 export class Server {
   readonly instance!: ReturnType<typeof createServer>;
   private readonly workerId: number;
   private readonly pendingRequests?: Map<string, (msg: Message) => void>;
-  private readonly dbPort: number;
+  private readonly dbPort: number | undefined;
   private readonly isCluster: boolean;
+  private database: Database | null = null;
 
   constructor(
     public port: number,
     private readonly isClusterWorker: boolean,
-    dbPort: number,
+    dbPort?: number,
   ) {
     this.instance = createServer(this.processRequest.bind(this));
     this.workerId = parseInt(process.env.WORKER_ID || '1', 10);
@@ -50,6 +53,9 @@ export class Server {
     if (requestData.error) {
       res.writeHead(requestData.error.statusCode, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(requestData.error));
+    } else if (!this.isCluster && this.database) {
+      const result = requestDatabase(requestData, this.database);
+      finishResponse(result);
     } else {
       this.forwardDbRequest(requestData, finishResponse);
     }
@@ -94,6 +100,7 @@ export class Server {
   }
 
   public start(): void {
+    if (!this.isCluster) this.database = new Database();
     this.instance.listen(this.port, () => {
       console.log(`${this.isCluster ? 'Worker' : 'Server'} started on port ${this.port}`);
       if (this.isClusterWorker) process.send?.('ready');

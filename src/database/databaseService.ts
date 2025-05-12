@@ -1,6 +1,6 @@
 import * as http from 'http';
 import { Database } from './database';
-import { Message } from '../types/users';
+import { DbUser, Message } from '../types/users';
 import { ApiError } from '../utils/errors';
 import { extractBody } from '../routes/routes';
 import { executeDbCommand } from './commandHandler';
@@ -34,4 +34,11 @@ export async function launchDatabase(port: number): Promise<ReturnType<typeof ht
     });
     service.on('error', reject);
   });
+}
+
+export function requestDatabase(msg: Message, storage: Database): Message {
+  const args = msg.data ?? [];
+  const result = storage[msg.action](...(args as [string & DbUser, DbUser]));
+  if (result instanceof ApiError) return { ...msg, data: undefined, error: result };
+  return { ...msg, data: typeof result === 'object' ? result : undefined };
 }

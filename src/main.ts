@@ -78,7 +78,7 @@ async function bootstrap() {
       const workerPort = Number(process.env.WORKER_PORT) || basePort;
       const dbPort = Number(process.env.DB_PORT) || basePort + DB_PORT_OFFSET;
 
-      if (!clusterMode) await launchDatabase(basePort + DB_PORT_OFFSET);
+      //if (!clusterMode) await launchDatabase(basePort + DB_PORT_OFFSET);
       new Server(clusterMode ? workerPort : basePort, cluster.isWorker, dbPort).start();
     } catch (err) {
       console.error('Worker failed:', err instanceof Error ? err.message : err);

@@ -1,25 +1,20 @@
-import { createServer } from 'http';
 import request from 'supertest';
 import { Server } from '../server';
 import { DbUser } from '../types/users';
-import { launchDatabase } from '../database/databaseService';
 
 jest.spyOn(console, 'error').mockImplementation(() => {});
 jest.spyOn(console, 'log').mockImplementation(() => {});
 
 describe('User API Integration Tests', () => {
   const testPort = 5000;
-  const dbPort = testPort + 1;
-  const testServer = new Server(testPort, false, dbPort);
+  const testServer = new Server(testPort, false);
   const { instance } = testServer;
-  let dbServer: ReturnType<typeof createServer>;
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   beforeAll(async () => {
-    dbServer = await launchDatabase(dbPort);
     testServer.start();
   });
 
@@ -146,7 +141,6 @@ describe('User API Integration Tests', () => {
   });
 
   afterAll(() => {
-    dbServer.close();
     instance.close();
   });
 });
