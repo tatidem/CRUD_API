@@ -6,6 +6,7 @@
   "scripts": {
     "start:dev": "nodemon",
     "start:multi": "nodemon -- --multi",
+    "test": "jest",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint --fix .",
     "format": "prettier --check \"src/**/*.ts\"",

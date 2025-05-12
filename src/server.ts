@@ -5,7 +5,7 @@ import { ApiError } from './utils/errors';
 import { extractBody, parseIncomingRequest } from './routes/routes';
 
 export class Server {
-  private readonly instance!: ReturnType<typeof createServer>;
+  readonly instance!: ReturnType<typeof createServer>;
   private readonly workerId: number;
   private readonly pendingRequests?: Map<string, (msg: Message) => void>;
   private readonly dbPort: number;

@@ -1,11 +1,11 @@
-import * as http from 'node:http';
+import * as http from 'http';
 import { Database } from './database';
 import { Message } from '../types/users';
 import { ApiError } from '../utils/errors';
 import { extractBody } from '../routes/routes';
 import { executeDbCommand } from './commandHandler';
 
-export async function launchDatabase(port: number): Promise<void> {
+export async function launchDatabase(port: number): Promise<ReturnType<typeof http.createServer>> {
   const dbInstance = new Database();
 
   const requestHandler = async (req: http.IncomingMessage, res: http.ServerResponse) => {
@@ -30,7 +30,7 @@ export async function launchDatabase(port: number): Promise<void> {
     const service = http.createServer(requestHandler);
     service.listen(port, () => {
       console.log(`Database service active on port ${port}`);
-      resolve();
+      resolve(service);
     });
     service.on('error', reject);
   });

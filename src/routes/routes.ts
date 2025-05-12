@@ -1,12 +1,8 @@
-import { IncomingMessage } from 'node:http';
-import { parse } from 'node:url';
+import { IncomingMessage } from 'http';
+import { parse } from 'url';
 import { ApiError } from '../utils/errors';
 import { Message } from '../types/users';
-import { validateUser } from '../utils/validate';
-// import { validate as isValidUuid } from 'uuid';
-// import { Message } from '../types';
-// import { validateUser } from '../utils/validators';
-// import { ApiError } from '../utils/apiError';
+import { isUUID, validateUser } from '../utils/validate';
 
 export async function extractBody<T>(req: IncomingMessage): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -42,9 +38,9 @@ export async function parseIncomingRequest(req: IncomingMessage): Promise<Messag
   const userId = pathSegments[2];
 
   if (pathSegments.length > 3) return createErrorResponse('Invalid endpoint', 404);
-  // if (pathSegments.length === 3 && !isValidUuid(userId)) {
-  //   return createErrorResponse('Invalid user ID format', 400);
-  // }
+  if (pathSegments.length === 3 && !isUUID(userId)) {
+    return createErrorResponse('Invalid user ID format', 400);
+  }
 
   try {
     switch (req.method) {
@@ -54,6 +50,7 @@ export async function parseIncomingRequest(req: IncomingMessage): Promise<Messag
           : { id: requestId, action: 'get', data: [userId] };
 
       case 'POST': {
+        if (userId) return createErrorResponse('Invalid API endpoint', 404);
         const body = await extractBody(req);
         const validationErrors = validateUser(body);
         return validationErrors.length > 0

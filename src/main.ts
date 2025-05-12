@@ -2,7 +2,7 @@ import cluster from 'node:cluster';
 import * as http from 'node:http';
 import { cpus } from 'node:os';
 import { launchDatabase } from './database/databaseService';
-import { Server } from './app';
+import { Server } from './server';
 import 'dotenv/config';
 
 const DB_PORT_OFFSET = 1;
