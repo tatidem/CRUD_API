@@ -1,50 +1,23 @@
 const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const isProduction = process.env.NODE_ENV == 'production';
 
-const config = {
-    entry: './src/index.ts',
-    output: {
-        filename: 'CRUD-API-app.js',
-        path: path.resolve(__dirname, 'build'),
-    },
-    plugins: [
-        new CleanWebpackPlugin(),
+module.exports = {
+  entry: './src/server.ts',
+  target: 'node',
+  mode: 'production',
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
     ],
-    module: {
-        rules: [
-            {
-                test: /\.ts$/i,
-                loader: 'ts-loader',
-                include: [path.resolve(__dirname, 'src')],
-                exclude: ['/node_modules/', '/build/'],
-            }
-        ],
-    },
-    resolve: {
-        extensions: ['.ts'],
-    },
-    target: 'node',
-    stats: {
-        all: false,
-        assets: true,
-        builtAt: true,
-        // cached: false,
-        errors: true,
-        warnings: true,
-        modules: false,
-        // moduleTrace: true,
-        performance: true,
-        errorDetails: true,
-        reasons: false,
-    },
-};
-
-module.exports = () => {
-    if (isProduction) {
-        config.mode = 'production';
-    } else {
-        config.mode = 'development';
-    }
-    return config;
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+  output: {
+    filename: 'server.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
 };
