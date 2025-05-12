@@ -1,9 +1,10 @@
-import cluster from 'node:cluster';
-import * as http from 'node:http';
-import { cpus } from 'node:os';
+import cluster from 'cluster';
+import * as http from 'http';
+import { cpus } from 'os';
 import { launchDatabase } from './database/databaseService';
 import { Server } from './server';
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const DB_PORT_OFFSET = 1;
 const WORKER_PORT_OFFSET = 2;
